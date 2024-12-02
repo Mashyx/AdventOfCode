@@ -1,4 +1,4 @@
-﻿namespace _2024;
+﻿namespace _2024.Days;
 
 public class Day1
 {
@@ -36,7 +36,7 @@ public class Day1
 
     private (List<int>, List<int>) split()
     {
-        string[] lines = File.ReadAllLines("Inputs/Input1.txt");
+        string[] lines = File.ReadAllLines("Inputs/InputDay1.txt");
         List<int> locationsLeft = new List<int>(); 
         List<int> locationsRight = new List<int>();
         foreach (string line in lines)
