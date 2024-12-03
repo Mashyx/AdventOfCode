@@ -19,3 +19,12 @@ day2.Part1();
 Console.Write("Part 2: ");
 day2.Part2();
 
+//Day 3
+Console.WriteLine("\nDay 3: Advent of Code");
+Console.Write("Part 1: ");
+Day3 day3 = new Day3();
+day3.Part1();
+
+Console.Write("Part 2: ");
+day3.Part2();
+

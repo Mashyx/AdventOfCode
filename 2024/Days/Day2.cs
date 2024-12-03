@@ -1,13 +1,13 @@
 ﻿namespace _2024.Days;
 
-public class Day2
+public class Day2 : MainDays
 {
     private List<int> numbers;
     private string[] lines;
 
     public Day2()
     {
-        ReadFile();
+       lines = ReadFile("Inputs/InputDay2.txt");
     }
     
     public void Part1()
@@ -57,10 +57,10 @@ public class Day2
         Console.WriteLine(counter);
     }
 
-    private void ReadFile()
+    /*private void ReadFile()
     {
         lines = File.ReadAllLines("Inputs/InputDay2.txt");
-    }
+    }*/
 
     private bool isSafe(List<int> numbs)
     {
@@ -74,10 +74,5 @@ public class Day2
             }
         }
         return true;
-    }
-
-    private void ifNotSafe(List<int> numbs)
-    {
-        
     }
 }
