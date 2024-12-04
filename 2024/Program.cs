@@ -28,3 +28,11 @@ day3.Part1();
 Console.Write("Part 2: ");
 day3.Part2();
 
+//Day 4
+Console.WriteLine("\nDay 4: Advent of Code");
+Console.Write("Part 1: ");
+Day4 day4 = new Day4();
+day4.Part1();
+
+Console.Write("Part 2: ");
+day4.Part2();
