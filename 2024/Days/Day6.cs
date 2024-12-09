@@ -26,7 +26,6 @@ public class Day6 : MainDays
     
     public void Part1()
     {
-        
         HashSet<(int, int)> visited = new();
         int vistedLocations = WalkPath(map, guardRow, guardCol, direction, false, visited);
         Console.WriteLine(vistedLocations);

@@ -64,6 +64,15 @@ day7.Part1();
 Console.Write("Part 2: ");
 day7.Part2();
 
+//Day 8
+Console.WriteLine("\nDay 8: Advent of Code");
+Console.Write("Part 1: ");
+Day8 day8 = new Day8();
+day8.Part1();
+
+Console.Write("Part 2: ");
+day8.Part2();
+
 //Day 
 /*Console.WriteLine("\nDay : Advent of Code");
 Console.Write("Part 1: ");
