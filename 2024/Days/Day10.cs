@@ -103,9 +103,7 @@ public class Day10
 
         Queue<(int, int, List<(int, int)>)> queue = new();
         queue.Enqueue((startRow, startCol, new List<(int, int)> { (startRow, startCol) }));
-
-        bool[,] visited = new bool[rows, cols];
-        visited[startRow, startCol] = true;
+        
         
         while (queue.Count > 0)
         {
@@ -122,18 +120,17 @@ public class Day10
                 int newRow = row + dx[i];
                 int newCol = col + dy[i];
                 
-                if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols && !visited[newRow, newCol])
+                if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols)
                 {
                     if (map[newRow][newCol] == map[row][col] + 1)
                     {
                         var newPath = new List<(int, int)>(path) { (newRow, newCol) };
                         queue.Enqueue((newRow, newCol, newPath));
-                        visited[newRow, newCol] = true;
+                        
                     }
                 }
             }
         }
-
         return distinctPaths;
     }
 
@@ -148,7 +145,7 @@ public class Day10
         {
             for (int j = 0; j < cols; j++)
             {
-                if (map[i][j] == '5')
+                if (map[i][j] == '0')
                 {
                     totalRatings += CalculateDistinctPaths(map, i, j);
                 }
