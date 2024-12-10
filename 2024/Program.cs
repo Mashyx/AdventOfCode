@@ -1,7 +1,7 @@
 ﻿using _2024;
 using _2024.Days;
 
-//Day 1
+/*//Day 1
 Console.WriteLine("Day 1: Advent of Code");
 Console.Write("Part 1: ");
 Day1 day1 = new Day1();
@@ -80,7 +80,16 @@ Day9 day9 = new Day9();
 day9.Part1();
 
 Console.Write("Part 2: ");
-day9.Part2();
+day9.Part2();*/
+
+//Day 
+Console.WriteLine("\nDay 10: Advent of Code");
+Console.Write("Part 1: ");
+Day10 day10 = new Day10();
+day10.Part1();
+
+Console.Write("Part 2: ");
+day10.Part2();
 
 //Day 
 /*Console.WriteLine("\nDay : Advent of Code");
