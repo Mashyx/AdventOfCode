@@ -2,98 +2,81 @@
 
 namespace _2024.Days;
 
-public class Day5 : MainDays
+public class Day5
 {
-    private string lines;
-    private List<(int, int)> rules;
-    private List<List<int>> updates;
+    private readonly string _lines;
+    private List<(int X, int Y)> _rules;
+    private List<List<int>> _updates;
 
     public Day5()
     {
-        lines = File.ReadAllText("Inputs/InputDay5.txt");
+        _lines = File.ReadAllText("Inputs/InputDay5.txt");
     }
+
     public void Part1()
     {
-        var sections = lines.Split("\r\n\r\n");
-        rules = makeRules(sections[0]);
-        updates = makeUpdates(sections[1]);
+        ParseInput();
+        int count = _updates
+            .Where(IsValid)
+            .Sum(update => update[update.Count / 2]);
 
-        int count = 0;
-
-        foreach (var update in updates)
-        {
-            if (isValid(update))
-            {
-                int middleIndex = update.Count / 2;
-                count += update[middleIndex];
-            }
-        }
         Console.WriteLine(count);
     }
 
     public void Part2()
     {
-        int count = 0;
-        var unsortedUpdates = updates.Where(update => !isValid(update)).ToList();
-        foreach (var update in unsortedUpdates)
-        {
-            var sortedUpdate = SortList(update);
-            int middleIndex = sortedUpdate.Count / 2;
-            count += sortedUpdate[middleIndex];
-        }
-        
+        int count = _updates
+            .Where(update => !IsValid(update))
+            .Select(SortUpdate)
+            .Sum(sortedUpdate => sortedUpdate[sortedUpdate.Count / 2]);
+
         Console.WriteLine(count);
     }
 
-    private List<(int X,int Y)> makeRules(string rulePart)
+    private void ParseInput()
     {
-        var rules = rulePart.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+        var sections = _lines.Split("\r\n\r\n");
+        _rules = ParseRules(sections[0]);
+        _updates = ParseUpdates(sections[1]);
+    }
+
+    private List<(int X, int Y)> ParseRules(string rulePart)
+    {
+        return rulePart.Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(line =>
             {
                 var parts = line.Split('|');
                 return (X: int.Parse(parts[0]), Y: int.Parse(parts[1]));
             })
             .ToList();
-        
-        return rules;
-    }
-    
-    private List<List<int>> makeUpdates(string updatePart)
-    {
-        var update = updatePart.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Split(',').Select(int.Parse).ToList())
-            .ToList();
-        return update;
     }
 
-    private bool isValid(List<int> update)
+    private List<List<int>> ParseUpdates(string updatePart)
+    {
+        return updatePart.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Split(',').Select(int.Parse).ToList())
+            .ToList();
+    }
+
+    private bool IsValid(List<int> update)
     {
         var positions = update
             .Select((value, index) => (value, index))
             .ToDictionary(x => x.value, x => x.index);
 
-        foreach (var (X, Y) in rules)
-        {
-            if (positions.ContainsKey(X) && positions.ContainsKey(Y))
-            {
-                if (positions[X] > positions[Y])
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return _rules.All(rule =>
+            !positions.ContainsKey(rule.X) || 
+            !positions.ContainsKey(rule.Y) || 
+            positions[rule.X] <= positions[rule.Y]);
     }
 
-    private List<int> SortList(List<int> update)
+    private List<int> SortUpdate(List<int> update)
     {
-        var list = update.OrderBy(page => page, Comparer<int>.Create((a, b) =>
-            {
-                if (rules.Any(rule => rule.Item1 == a && rule.Item2 == b)) return -1;
-                if (rules.Any(rule => rule.Item1 == b && rule.Item2 == a)) return 1;
-                return 0;
-            }))
-            .ToList();
-        return list;
+        return update.OrderBy(page => page, Comparer<int>.Create((a, b) =>
+        {
+            if (_rules.Any(rule => rule.X == a && rule.Y == b)) return -1;
+            if (_rules.Any(rule => rule.X == b && rule.Y == a)) return 1;
+            return 0;
+        })).ToList();
     }
 }

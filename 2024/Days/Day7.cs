@@ -4,14 +4,14 @@ namespace _2024.Days;
 
 public class Day7
 {
-    private List<string> lines;
+    private readonly List<string> _lines;
     public Day7()
     {
-        lines = new List<string>(File.ReadAllLines("Inputs/InputDay7.txt"));
+        _lines = new List<string>(File.ReadAllLines("Inputs/InputDay7.txt"));
     }
     public void Part1()
     {
-        (List<long> results,  List<string> equations) = ParseInput(lines);
+        (List<long> results,  List<string> equations) = ParseInput(_lines);
         long sum = 0;
         for (int i = 0; i < equations.Count; i++)
         {
@@ -29,7 +29,7 @@ public class Day7
 
     public void Part2()
     {
-        (List<long> results,  List<string> equations) = ParseInput(lines);
+        (List<long> results,  List<string> equations) = ParseInput(_lines);
         long sum = 0;
         for (int i = 0; i < equations.Count; i++)
         {

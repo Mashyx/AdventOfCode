@@ -2,27 +2,31 @@
 
 public class Day8
 {
-    private Dictionary<char, List<(int x, int y)>> map = new();
-    private int rows, cols;
+    private readonly Dictionary<char, List<(int x, int y)>> _map = new();
+    private readonly int _rows, _cols;
+
     public Day8()
     {
         string[] input = File.ReadAllLines("Inputs/InputDay8.txt");
-        rows = input.Length;
-        cols = input[0].Length;
-
-        for (int y = 0; y < rows; y++)
+        _rows = input.Length;
+        _cols = input[0].Length;
+        
+        for (int y = 0; y < _rows; y++)
         {
-            for (int x = 0; x < cols; x++)
+            for (int x = 0; x < _cols; x++)
             {
-                if (input[y][x] == '.') continue;
-                if (!map.ContainsKey(input[y][x]))
+                char cell = input[y][x];
+                if (cell == '.') continue;
+                
+                if (!_map.ContainsKey(cell))
                 {
-                    map[input[y][x]] = new List<(int x, int y)>();
+                    _map[cell] = new List<(int x, int y)>();
                 }
-                map[input[y][x]].Add((x, y));
+                _map[cell].Add((x, y));
             }
         }
     }
+
     public void Part1()
     {
         Console.WriteLine(CountAntinodes());
@@ -36,54 +40,59 @@ public class Day8
     private int CountAntinodes()
     {
         var result = new HashSet<(int x, int y)>();
-        foreach (var chr in map.Keys)
+
+        foreach (var chr in _map.Keys)
         {
-            foreach (var antenna in map[chr])
+            var antennas = _map[chr];
+            foreach (var antenna in antennas)
             {
-                foreach (var otherAntenna in map[chr])
+                foreach (var otherAntenna in antennas)
                 {
                     if (antenna == otherAntenna) continue;
-                    var dx = antenna.x - otherAntenna.x;
-                    var dy = antenna.y - otherAntenna.y;
-                    
-                    var newX = antenna.x + dx;
-                    var newY = antenna.y + dy;
-                    
-                    if (newX < 0 || newY < 0 || newX >= cols || newY >= rows) continue;
-                    result.Add((newX, newY));
+                    var (dx, dy) = (antenna.x - otherAntenna.x, antenna.y - otherAntenna.y);
+                    var (newX, newY) = (antenna.x + dx, antenna.y + dy);
+
+                    if (IsValidPosition(newX, newY)) 
+                        result.Add((newX, newY));
                 }
             }
         }
+
         return result.Count;
     }
-    
+
     private int CountAntinodes2()
     {
         var result = new HashSet<(int x, int y)>();
-        foreach (var chr in map.Keys)
+
+        foreach (var chr in _map.Keys)
         {
-            foreach (var antenna in map[chr])
+            var antennas = _map[chr];
+            foreach (var antenna in antennas)
             {
-                result.Add((antenna.x, antenna.y));
-                foreach (var otherAntenna in map[chr])
+                result.Add(antenna);
+                foreach (var otherAntenna in antennas)
                 {
                     if (antenna == otherAntenna) continue;
-                    var dx = antenna.x - otherAntenna.x;
-                    var dy = antenna.y - otherAntenna.y;
                     
-                    var X = antenna.x;
-                    var Y = antenna.y;
+                    var (dx, dy) = (antenna.x - otherAntenna.x, antenna.y - otherAntenna.y);
                     int multiplier = 1;
-
-                    while (!(X + dx*multiplier < 0 || Y + dy*multiplier < 0 ||X + dx*multiplier >= cols || Y + dy*multiplier >= rows))
+                    var (X, Y) = (antenna.x, antenna.y);
+                    
+                    while (IsValidPosition(X + dx * multiplier, Y + dy * multiplier))
                     {
-                        result.Add((X + dx*multiplier,Y + dy*multiplier));
+                        result.Add((X + dx * multiplier, Y + dy * multiplier));
                         multiplier++;
                     }
                 }
             }
         }
+
         return result.Count;
     }
     
+    private bool IsValidPosition(int x, int y)
+    {
+        return x >= 0 && y >= 0 && x < _cols && y < _rows;
+    }
 }

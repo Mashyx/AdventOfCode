@@ -1,78 +1,80 @@
 ﻿namespace _2024.Days;
 
-public class Day2 : MainDays
+public class Day2
 {
-    private List<int> numbers;
-    private string[] lines;
+    private readonly string[] _lines;
 
     public Day2()
     {
-       lines = ReadFile("Inputs/InputDay2.txt");
+        _lines = File.ReadAllLines("Inputs/InputDay2.txt");
     }
-    
+
     public void Part1()
     {
-        int counter = 0;
-        
-        for (int i = 0; i < lines.Length; i++)
-        {
-            numbers = lines[i].Split(' ').Select(int.Parse).ToList();
-
-            if (isSafe(numbers))
-            {
-                counter++;
-            }
-        }
-        Console.WriteLine(counter);
+        int safeCount = _lines.Count(line => IsSafe(ParseNumbers(line)));
+        Console.WriteLine(safeCount);
     }
 
     public void Part2()
     {
-        int counter = 0;
-        
-        for (int i = 0; i < lines.Length; i++)
-        {
-            numbers = lines[i].Split(' ').Select(int.Parse).ToList();
-            
+        int safeCount = 0;
 
-            if (isSafe(numbers))
+        foreach (var line in _lines)
+        {
+            var numbers = ParseNumbers(line);
+
+            if (IsSafe(numbers))
             {
-                counter++;
+                safeCount++;
             }
             else
             {
-                for (int j = 0; j < numbers.Count; j++)
+                for (int index = 0; index < numbers.Count; index++)
                 {
-                    List<int> numbersCopy = new List<int>(numbers);
-                    numbersCopy.RemoveAt(j);
-
-                    if (isSafe(numbersCopy))
+                    if (IsSafe(RemoveAt(numbers, index)))
                     {
-                        counter++;
+                        safeCount++;
                         break;
                     }
                 }
             }
+
         }
-        Console.WriteLine(counter);
+
+        Console.WriteLine(safeCount);
     }
 
-    /*private void ReadFile()
+    private static List<int> ParseNumbers(string line)
     {
-        lines = File.ReadAllLines("Inputs/InputDay2.txt");
-    }*/
+        return line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Select(int.Parse)
+            .ToList();
+    }
 
-    private bool isSafe(List<int> numbs)
+    private static List<int> RemoveAt(List<int> numbers, int index)
     {
-        bool increasing = numbs[0] < numbs[1];
-        for (int i = 0; i < numbs.Count - 1; i++)
+        var copy = new List<int>(numbers);
+        copy.RemoveAt(index);
+        return copy;
+    }
+
+    private static bool IsSafe(List<int> numbers)
+    {
+        if (numbers.Count < 2)
+            return false;
+
+        bool isIncreasing = numbers[0] < numbers[1];
+
+        for (int i = 0; i < numbers.Count - 1; i++)
         {
-            int result = Math.Abs(numbs[i] - numbs[i + 1]);
-            if (result > 3 || result <= 0 || numbs[i] < numbs[i + 1] != increasing)
+            int difference = Math.Abs(numbers[i] - numbers[i + 1]);
+
+            if (difference > 3 || difference == 0 || (numbers[i] < numbers[i + 1]) != isIncreasing)
             {
                 return false;
             }
         }
+
         return true;
     }
 }

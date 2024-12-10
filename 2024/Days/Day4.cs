@@ -1,14 +1,15 @@
 ﻿namespace _2024.Days;
 
-public class Day4 : MainDays
+public class Day4
 {
-    private string[] _lines;
-    private int _rows, _columns;
+    private readonly string[] _lines;
+    private int _rows;
+    private int _columns;
     private char[,] _grid;
 
     public Day4()
     {
-        _lines = ReadFile("Inputs/InputDay4.txt");
+        _lines = File.ReadAllLines("Inputs/InputDay4.txt");
         SetGrid();
     }
 

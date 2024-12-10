@@ -2,62 +2,62 @@
 
 namespace _2024.Days;
 
-public class Day3 : MainDays
+public class Day3
 {
-    private string lines;
+    private readonly string _input;
+
     public Day3()
     {
-        lines = File.ReadAllText("Inputs/InputDay3.txt");
+        _input = File.ReadAllText("Inputs/InputDay3.txt");
     }
+
     public void Part1()
     {
-        int result = 0;
-        
-        List<string> pattern = Regex.Matches(lines, @"mul\(\d+,\d+\)").Select(match => match.Value).ToList();
+        int result = Regex.Matches(_input, @"mul\(\d+,\d+\)")
+            .Select(match => Multiply(match.Value))
+            .Sum();
 
-        foreach (string p in pattern)
-        {
-            result += Mulitplying(p);
-        }
-        
         Console.WriteLine(result);
     }
 
     public void Part2()
     {
         int result = 0;
-        List<string> pattern = Regex.Matches(lines, @"mul\(\d+,\d+\)|do\(\)|don't\(\)").Select(match => match.Value).ToList();
-        bool dont = false;
+        bool skip = false;
 
-        foreach (string p in pattern)
+        var patterns = Regex.Matches(_input, @"mul\(\d+,\d+\)|do\(\)|don't\(\)")
+            .Select(match => match.Value);
+
+        foreach (var pattern in patterns)
         {
-                if (p == "don't()")
-                {
-                    dont = true;
-                    continue;
-                }
+            switch (pattern)
+            {
+                case "don't()":
+                    skip = true;
+                    break;
 
-                if (p == "do()")
-                {
-                    dont = false;
-                    continue;
-                }
-                
-                if (!dont)
-                {
-                    result += Mulitplying(p);
-                }
-            
+                case "do()":
+                    skip = false;
+                    break;
+
+                default:
+                    if (!skip)
+                    {
+                        result += Multiply(pattern);
+                    }
+                    break;
+            }
         }
+
         Console.WriteLine(result);
     }
 
-    private int Mulitplying(string p)
+    private static int Multiply(string expression)
     {
-        var replace = p.Replace("mul(", "").Replace(")", "");
-        var split = replace.Split(",").Select(int.Parse).ToArray();
-        int num1 = split[0];
-        int num2 = split[1];
-        return num1 * num2;
+        var numbers = expression.Replace("mul(", "").Replace(")", "")
+            .Split(',')
+            .Select(int.Parse)
+            .ToArray();
+        return numbers[0] * numbers[1];
     }
 }

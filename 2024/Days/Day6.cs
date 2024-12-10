@@ -2,17 +2,36 @@
 
 namespace _2024.Days;
 
-public class Day6 : MainDays
+public class Day6
 {
-    private char[,] map;
-    int guardRow, guardCol;
-    Direction direction;
+    private readonly char[,] _map;
+    private readonly int _guardRow, _guardCol;
+    private readonly Direction _direction;
+
     public Day6()
     {
-        string[] input = File.ReadAllLines("Inputs/InputDay6.txt");
+        var input = File.ReadAllLines("Inputs/InputDay6.txt");
+        _map = ParseMap(input);
+        (_guardRow, _guardCol, _direction) = FindGuard(_map);
+    }
+
+    public void Part1()
+    {
+        var visitedLocations = WalkPath(_map, _guardRow, _guardCol, _direction, false);
+        Console.WriteLine(visitedLocations);
+    }
+
+    public void Part2()
+    {
+        var loopCount = FindLoops(_map, _guardRow, _guardCol, _direction);
+        Console.WriteLine(loopCount);
+    }
+
+    private static char[,] ParseMap(string[] input)
+    {
         int rows = input.Length;
         int cols = input[0].Length;
-        map = new char[rows, cols];
+        var map = new char[rows, cols];
 
         for (int i = 0; i < rows; i++)
         {
@@ -21,25 +40,13 @@ public class Day6 : MainDays
                 map[i, j] = input[i][j];
             }
         }
-        (guardRow, guardCol, direction) = FindGuard(map);
-    }
-    
-    public void Part1()
-    {
-        HashSet<(int, int)> visited = new();
-        int vistedLocations = WalkPath(map, guardRow, guardCol, direction, false, visited);
-        Console.WriteLine(vistedLocations);
+
+        return map;
     }
 
-    public void Part2()
+    private static (int, int, Direction) FindGuard(char[,] map)
     {
-        int loops = FindLoops(map, guardRow, guardCol, direction);
-        Console.WriteLine(loops);
-    }
-
-    private (int, int, Direction) FindGuard(char[,] map)
-    {
-        Dictionary<char, Direction> directions = new()
+        var directions = new Dictionary<char, Direction>
         {
             { '^', Direction.Up },
             { '>', Direction.Right },
@@ -51,127 +58,127 @@ public class Day6 : MainDays
         {
             for (int j = 0; j < map.GetLength(1); j++)
             {
-                char cell = map[i, j];
-
-                if (directions.ContainsKey(cell))
+                if (directions.TryGetValue(map[i, j], out var direction))
                 {
-                    Direction direction = directions[cell];
                     return (i, j, direction);
                 }
             }
         }
+
         throw new Exception("No guard found");
     }
 
-    private int WalkPath(char[,] map, int guardRow, int guardCol, Direction guardDirection, bool looping, HashSet<(int, int)> visited = null)
+    private static int WalkPath(char[,] map, int row, int col, Direction direction, bool findLoop)
     {
-        Dictionary<Direction, (int dx, int dy)> directionWalk = new()
+        var directionOffsets = new Dictionary<Direction, (int dx, int dy)>
         {
             { Direction.Up, (-1, 0) },
             { Direction.Right, (0, 1) },
             { Direction.Down, (1, 0) },
-            { Direction.Left, (0, -1)}
+            { Direction.Left, (0, -1) }
         };
-        
-        HashSet<(int, int, Direction)>? visitedLoops = looping ? new HashSet<(int, int, Direction)>() : null;
 
-        if (!looping)
+        if (findLoop)
         {
-            visited.Add((guardRow, guardCol));
-        }
-        else
-        {
-            visitedLoops.Add((guardRow, guardCol, guardDirection));
-        }
-        
-
-        while (true)
-        {
-            (int dx, int dy) = directionWalk[guardDirection];
-            int nextRow = guardRow + dx;
-            int nextCol = guardCol + dy;
-
-            if (nextRow < 0 || nextRow >= map.GetLength(0) || nextCol < 0 || nextCol >= map.GetLength(1))
+            var visitedLoops = new HashSet<(int, int, Direction)>();
+            while (true)
             {
-                return looping ? 0 : visited.Count;
-            }
+                var (dx, dy) = directionOffsets[direction];
+                int nextRow = row + dx;
+                int nextCol = col + dy;
 
-            if (map[nextRow, nextCol] == '#')
-            {
-                guardDirection = Turn(guardDirection);
-            }
-            else
-            {
-                guardRow = nextRow;
-                guardCol = nextCol;
+                if (!IsValidPosition(map, nextRow, nextCol)) return 0;
 
-                if (!looping)
+                if (map[nextRow, nextCol] == '#')
                 {
-                    visited.Add((guardRow, guardCol));
+                    direction = TurnRight(direction);
                 }
                 else
                 {
-                    if (visitedLoops.Contains((guardRow, guardCol, guardDirection)))
+                    row = nextRow;
+                    col = nextCol;
+
+                    if (!visitedLoops.Add((row, col, direction)))
                     {
-                        return 1;
+                        return 1; // Loop detected
                     }
-                    
-                    visitedLoops.Add((guardRow, guardCol, guardDirection));
                 }
             }
         }
-    }
-
-    private Direction Turn(Direction direction)
-    {
-        Direction[] directions =
+        else
         {
-            Direction.Up, 
-            Direction.Right, 
-            Direction.Down, 
-            Direction.Left
-        };
-        
-        int currentIndex = Array.IndexOf(directions, direction);
-        return directions[(currentIndex + 1) % directions.Length];
-    }
+            var visited = new HashSet<(int, int)>();
+            visited.Add((row, col));
 
-    enum Direction
-    {
-        Up, 
-        Right, 
-        Down, 
-        Left
-    }
-
-    private int FindLoops(char[,] map, int guardRow, int guardCol, Direction guardDirection)
-    {
-        List<(int, int)> possibleObstacles = new();
-        int countLoops = 0;
-        
-        for (int i = 0; i < map.GetLength(0); i++)
-        {
-            for (int j = 0; j < map.GetLength(1); j++)
+            while (true)
             {
-                if (map[i, j] == '.' && !(i == guardRow && j == guardCol))
+                var (dx, dy) = directionOffsets[direction];
+                int nextRow = row + dx;
+                int nextCol = col + dy;
+
+                if (!IsValidPosition(map, nextRow, nextCol)) return visited.Count;
+
+                if (map[nextRow, nextCol] == '#')
                 {
-                    possibleObstacles.Add((i, j));
+                    direction = TurnRight(direction);
+                }
+                else
+                {
+                    row = nextRow;
+                    col = nextCol;
+                    visited.Add((row, col));
                 }
             }
         }
+    }
 
-        foreach ((int row, int col) in possibleObstacles)
+
+    private static int FindLoops(char[,] map, int row, int col, Direction direction)
+    {
+        var possibleObstacles = Enumerable.Range(0, map.GetLength(0))
+            .SelectMany(i => Enumerable.Range(0, map.GetLength(1)).Select(j => (i, j)))
+            .Where(pos => map[pos.i, pos.j] == '.' && !(pos.i == row && pos.j == col))
+            .ToList();
+
+        int loopCount = 0;
+
+        foreach (var (obstacleRow, obstacleCol) in possibleObstacles)
         {
-            map[row, col] = '#';
+            map[obstacleRow, obstacleCol] = '#';
 
-            if (WalkPath(map, guardRow, guardCol, guardDirection, true) == 1)
+            if (WalkPath(map, row, col, direction, true) == 1)
             {
-                countLoops++;
+                loopCount++;
             }
-            
-            map[row, col] = '.';
+
+            map[obstacleRow, obstacleCol] = '.';
         }
-        
-        return countLoops;
+
+        return loopCount;
+    }
+
+    private static bool IsValidPosition(char[,] map, int row, int col)
+    {
+        return row >= 0 && row < map.GetLength(0) && col >= 0 && col < map.GetLength(1);
+    }
+
+    private static Direction TurnRight(Direction direction)
+    {
+        return direction switch
+        {
+            Direction.Up => Direction.Right,
+            Direction.Right => Direction.Down,
+            Direction.Down => Direction.Left,
+            Direction.Left => Direction.Up,
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+        };
+    }
+
+    private enum Direction
+    {
+        Up,
+        Right,
+        Down,
+        Left
     }
 }

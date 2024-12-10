@@ -1,54 +1,41 @@
 ﻿namespace _2024.Days;
 
-public class Day1 : MainDays
+public class Day1
 {
     public void Part1()
     {
-        int total = 0;
-        (List<int>, List<int>) splitlines = split();
-        var left = splitlines.Item1;
-        var right = splitlines.Item2;
-        
-        for (int i = 0; i < left.Count; i++)
-        {
-            total += Math.Abs(left[i] - right[i]);
-        }
-        
+        var (left, right) = ReadAndSplitInput("Inputs/InputDay1.txt");
+        int total = left.Zip(right, (l, r) => Math.Abs(l - r)).Sum();
+
         Console.WriteLine(total);
     }
 
     public void Part2()
     {
-        int count = 0;
-        int total = 0;
-        (List<int>, List<int>) splitlines = split();
-        var left = splitlines.Item1;
-        var right = splitlines.Item2;
+        var (left, right) = ReadAndSplitInput("Inputs/InputDay1.txt");
+        int total = left.Sum(num => num * right.Count(r => r == num));
 
-        foreach (var num in left)
-        {
-            count = right.Where(number => number == num).ToList().Count;
-            total += num * count;
-        }
-        
         Console.WriteLine(total);
     }
 
-    private (List<int>, List<int>) split()
+    private static (List<int> Left, List<int> Right) ReadAndSplitInput(string filePath)
     {
-        string[] lines = ReadFile("Inputs/InputDay1.txt");
-        List<int> locationsLeft = new List<int>(); 
-        List<int> locationsRight = new List<int>();
-        foreach (string line in lines)
+        var left = new List<int>();
+        var right = new List<int>();
+
+        foreach (var line in File.ReadLines(filePath))
         {
-            var splitline  = line.Split("   ");
-            locationsLeft.Add(int.Parse(splitline[0]));
-            locationsRight.Add(int.Parse(splitline[1]));
+            var parts = line.Split("   ", StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 2 && int.TryParse(parts[0], out var leftValue) && int.TryParse(parts[1], out var rightValue))
+            {
+                left.Add(leftValue);
+                right.Add(rightValue);
+            }
         }
-        locationsLeft.Sort();
-        locationsRight.Sort();
-        return (locationsLeft, locationsRight);
+
+        left.Sort();
+        right.Sort();
+        return (left, right);
     }
-    
 }
 
