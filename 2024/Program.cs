@@ -80,7 +80,7 @@ Day9 day9 = new Day9();
 day9.Part1();
 
 Console.Write("Part 2: ");
-day9.Part2();*/
+day9.Part2();
 
 //Day 
 Console.WriteLine("\nDay 10: Advent of Code");
@@ -90,6 +90,16 @@ day10.Part1();
 
 Console.Write("Part 2: ");
 day10.Part2();
+*/
+
+//Day 
+Console.WriteLine("\nDay 11: Advent of Code");
+Console.Write("Part 1: ");
+Day11 day11 = new Day11();
+day11.Part1();
+
+Console.Write("Part 2: ");
+day11.Part2();
 
 //Day 
 /*Console.WriteLine("\nDay : Advent of Code");
